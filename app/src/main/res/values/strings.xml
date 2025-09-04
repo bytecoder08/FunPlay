@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Fun Play</string>
+    <string name="tab_videos">Videos</string>
+    <string name="tab_playlists">Playlists</string>
+    <string name="tab_explorer">Explorer</string>
+    <string name="player_more_options">Playback Options</string>
+</resources>

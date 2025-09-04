@@ -1,0 +1,32 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Playback speed -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Playback speed" android:textStyle="bold"/>
+        <com.google.android.material.slider.Slider
+            android:id="@+id/speedSlider"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:valueFrom="0.5" android:valueTo="2.0" android:stepSize="0.25"/>
+
+        <!-- Audio track -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Audio track" android:textStyle="bold" android:paddingTop="12dp"/>
+        <Spinner
+            android:id="@+id/spinnerAudio"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <!-- Subtitle track -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Subtitles" android:textStyle="bold" android:paddingTop="12dp"/>
+        <Spinner
+            android:id="@+id/spinnerSubtitle"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>
