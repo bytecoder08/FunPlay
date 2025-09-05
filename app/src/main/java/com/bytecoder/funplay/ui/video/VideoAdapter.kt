@@ -25,8 +25,8 @@ class VideoAdapter(private val onClick: (Video) -> Unit)
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val v = getItem(position)
-        holder.bind.title.text = v.title
-        holder.bind.duration.text = TimeUtils.format(v.durationMs)
+        holder.bind.title.text = v.name
+        holder.bind.duration.text = TimeUtils.format(v.duration)
         Glide.with(holder.itemView).load(v.uri).into(holder.bind.thumbnail)
         holder.itemView.setOnClickListener { onClick(v) }
     }

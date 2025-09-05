@@ -16,21 +16,32 @@ class VideoListFragment : Fragment() {
     private val bind get() = _bind!!
     private val vm: VideoListViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        FragmentVideoListBinding.inflate(inflater, container, false).also { _bind = it }.root
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = FragmentVideoListBinding.inflate(inflater, container, false).also { _bind = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = VideoAdapter { video ->
-            startActivity(Intent(requireContext(), VideoPlayerActivity::class.java).apply {
-                putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, video.uri.toString())
-                putExtra(VideoPlayerActivity.EXTRA_VIDEO_TITLE, video.title)
-                putExtra(VideoPlayerActivity.EXTRA_VIDEO_PATH, video.path)
-            })
+            startActivity(
+                Intent(requireContext(), VideoPlayerActivity::class.java).apply {
+                    // ✅ pass Uri as String
+                    putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, video.uri.toString())
+                    putExtra(VideoPlayerActivity.EXTRA_VIDEO_TITLE, video.name)
+                    putExtra(VideoPlayerActivity.EXTRA_VIDEO_PATH, video.path)
+                }
+            )
         }
         bind.recycler.layoutManager = GridLayoutManager(requireContext(), 2)
         bind.recycler.adapter = adapter
 
         vm.videos.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        vm.load()
+    }
+
+    // ✅ called from MainActivity after permissions are granted
+    fun reloadVideos() {
         vm.load()
     }
 

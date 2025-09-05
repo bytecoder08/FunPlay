@@ -3,6 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.bytecoder.funplay">
 
+    <!-- Permissions -->
+    <!-- For Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- For Android 12 and below -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Optional: write access if you later add saving features -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" tools:ignore="ScopedStorage" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -13,6 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FunPlay">
+
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
@@ -22,7 +32,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
 
         <activity android:name=".ui.main.MainActivity" android:exported="false" />
         <activity android:name=".ui.player.VideoPlayerActivity" android:exported="false" />

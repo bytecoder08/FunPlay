@@ -33,24 +33,29 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         val player = vm.player
         bind.playerView.player = player
+
         bind.playerView.setControllerVisibilityListener(
             StyledPlayerView.ControllerVisibilityListener { vis ->
                 bind.volumeSlider.visibility = if (vis == View.VISIBLE) View.VISIBLE else View.GONE
             }
         )
 
-        val uri = Uri.parse(intent.getStringExtra(EXTRA_VIDEO_URI))
+        // ✅ safely parse String back into Uri
+        val uriString = intent.getStringExtra(EXTRA_VIDEO_URI)
+        val uri = uriString?.let { Uri.parse(it) }
         val title = intent.getStringExtra(EXTRA_VIDEO_TITLE) ?: "Video"
         val path = intent.getStringExtra(EXTRA_VIDEO_PATH) ?: ""
 
-        var item = MediaItem.fromUri(uri)
-        // optional: attach sidecar subtitles if present
-        com.bytecoder.funplay.data.repository.SubtitleRepository.guessFromFileSidecar(path)?.let { sub ->
-            item = SubtitleHandler.attachExternal(item, sub.uri, sub.mimeType, sub.label)
-        }
+        if (uri != null) {
+            var item = MediaItem.fromUri(uri)
+            // optional: attach sidecar subtitles if present
+            com.bytecoder.funplay.data.repository.SubtitleRepository.guessFromFileSidecar(path)?.let { sub ->
+                item = SubtitleHandler.attachExternal(item, sub.uri, sub.mimeType, sub.label)
+            }
 
-        PlayerManager.get(this).setSingle(item)
-        scope.launch { PlaybackConfig.applySaved(player, this@VideoPlayerActivity) }
+            PlayerManager.get(this).setSingle(item)
+            scope.launch { PlaybackConfig.applySaved(player, this@VideoPlayerActivity) }
+        }
 
         bind.volumeSlider.addOnChangeListener { _, value, _ ->
             player.volume = value
