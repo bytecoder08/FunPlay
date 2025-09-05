@@ -101,7 +101,7 @@
                 android:id="@+id/btnFullscreen"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_crop"
+                android:src="@drawable/ic_fullscreen"
                 android:background="@android:color/transparent"
                 app:tint="@android:color/white"/>
 
@@ -109,43 +109,39 @@
                 android:id="@+id/btnOptions"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_more"
+                android:src="@drawable/ic__more_vert"
                 android:background="@android:color/transparent"
                 app:tint="@android:color/white"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Vertical Sliders -->
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+    <!-- Brightness slider (LEFT) -->
+    <com.google.android.material.slider.Slider
+        android:id="@+id/brightnessSlider"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:layout_margin="12dp"
+        android:rotation="270"
+        android:valueFrom="0.0"
+        android:valueTo="1.0"
+        android:value="0.5"
+        />
+<!--        android:visibility="gone" -->
+
+    <!-- Volume slider (RIGHT) -->
+    <com.google.android.material.slider.Slider
+        android:id="@+id/volumeSlider"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
-        android:gravity="center"
-        android:padding="8dp">
-
-        <!-- Volume slider -->
-        <com.google.android.material.slider.Slider
-            android:id="@+id/volumeSlider"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:rotation="270"
-            android:valueFrom="0.0"
-            android:valueTo="1.0"
-            android:value="1.0"
-            android:visibility="gone" />
-
-        <!-- Brightness slider -->
-        <com.google.android.material.slider.Slider
-            android:id="@+id/brightnessSlider"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:rotation="270"
-            android:valueFrom="0.0"
-            android:valueTo="1.0"
-            android:value="0.5"
-            android:visibility="gone" />
-    </LinearLayout>
+        android:layout_margin="12dp"
+        android:rotation="270"
+        android:valueFrom="0.0"
+        android:valueTo="1.0"
+        android:value="1.0"
+        />
+<!--        android:visibility="gone"-->
 
     <!-- Buffer spinner -->
     <ProgressBar

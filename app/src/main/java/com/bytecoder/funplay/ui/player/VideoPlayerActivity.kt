@@ -3,13 +3,13 @@ package com.bytecoder.funplay.ui.player
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageButton
 import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bytecoder.funplay.R
@@ -17,11 +17,10 @@ import com.bytecoder.funplay.databinding.ActivityVideoPlayerBinding
 import com.bytecoder.funplay.player.PlaybackConfig
 import com.bytecoder.funplay.player.PlayerManager
 import com.bytecoder.funplay.player.SubtitleHandler
-import com.bytecoder.funplay.viewmodel.PlayerViewModel
 import com.bytecoder.funplay.utils.TimeUtils
+import com.bytecoder.funplay.viewmodel.PlayerViewModel
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -38,6 +37,9 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     private var isFullscreen = false
     private var fullscreenBtn: ImageButton? = null
+
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private val hideUiRunnable = Runnable { hideControls() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +69,7 @@ class VideoPlayerActivity : AppCompatActivity() {
             scope.launch { PlaybackConfig.applySaved(player, this@VideoPlayerActivity) }
         }
 
-        // === Seekbar updates ===
+        // === Player state listener ===
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
                 bind.bufferSpinner.visibility =
@@ -79,9 +81,11 @@ class VideoPlayerActivity : AppCompatActivity() {
                     if (isPlaying) android.R.drawable.ic_media_pause
                     else android.R.drawable.ic_media_play
                 )
+                resetUiTimer()
             }
         })
 
+        // === Seekbar updates ===
         bind.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) player.seekTo(progress.toLong())
@@ -91,9 +95,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         })
 
         // === Playback controls ===
-        bind.btnPlayPause.setOnClickListener {
-            if (player.isPlaying) player.pause() else player.play()
-        }
+        bind.btnPlayPause.setOnClickListener { if (player.isPlaying) player.pause() else player.play() }
         bind.btnForward.setOnClickListener { player.seekForward() }
         bind.btnRewind.setOnClickListener { player.seekBack() }
         bind.btnNext.setOnClickListener { player.seekToNext() }
@@ -103,18 +105,26 @@ class VideoPlayerActivity : AppCompatActivity() {
         bind.volumeSlider.addOnChangeListener { _, value, _ ->
             player.volume = value
             scope.launch { PlaybackConfig.saveVolume(this@VideoPlayerActivity, value) }
+            resetUiTimer()
         }
         bind.brightnessSlider.addOnChangeListener { _, value, _ ->
             setScreenBrightness(value)
+            resetUiTimer()
         }
 
         // === 3-dots options ===
         bind.btnOptions.setOnClickListener {
             PlayerOptionsDialog().show(supportFragmentManager, "opts")
+            resetUiTimer()
         }
 
         // === Gestures (seek, volume, brightness) ===
         val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                toggleControls()
+                return true
+            }
+
             override fun onScroll(
                 e1: MotionEvent?,
                 e2: MotionEvent,
@@ -136,6 +146,7 @@ class VideoPlayerActivity : AppCompatActivity() {
                         adjustVolume(-deltaY, player)
                     }
                 }
+                resetUiTimer()
                 return true
             }
         })
@@ -157,26 +168,24 @@ class VideoPlayerActivity : AppCompatActivity() {
                 Thread.sleep(500)
             }
         }.start()
+
+        // Show controls initially
+        showControls()
     }
 
     private fun toggleFullscreen() {
         if (isFullscreen) {
-            supportActionBar?.show()
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            fullscreenBtn?.setImageResource(android.R.drawable.ic_menu_crop)
+            fullscreenBtn?.setImageResource(R.drawable.ic_fullscreen)
         } else {
-            supportActionBar?.hide()
-            window.decorView.systemUiVisibility =
-                (View.SYSTEM_UI_FLAG_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            fullscreenBtn?.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            fullscreenBtn?.setImageResource(R.drawable.ic_fullscreen_exit)
         }
         isFullscreen = !isFullscreen
+        resetUiTimer()
     }
 
+    // === Brightness & Volume adjustments (slower) ===
     private fun setScreenBrightness(value: Float) {
         val lp = window.attributes
         lp.screenBrightness = value
@@ -185,13 +194,42 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     private fun adjustBrightness(delta: Float) {
         val lp = window.attributes
-        lp.screenBrightness = (lp.screenBrightness + delta / 1000).coerceIn(0f, 1f)
+        lp.screenBrightness = (lp.screenBrightness + delta / 50000f).coerceIn(0f, 1f)
         window.attributes = lp
+        bind.brightnessSlider.value = lp.screenBrightness
     }
 
     private fun adjustVolume(delta: Float, player: com.google.android.exoplayer2.ExoPlayer) {
-        player.volume = (player.volume + delta / 1000).coerceIn(0f, 1f)
+        player.volume = (player.volume + delta / 50000f).coerceIn(0f, 1f)
         bind.volumeSlider.value = player.volume
+    }
+
+    // === UI auto-hide logic ===
+    private fun resetUiTimer() {
+        showControls()
+        uiHandler.removeCallbacks(hideUiRunnable)
+        uiHandler.postDelayed(hideUiRunnable, 5000) // 5s
+    }
+
+    private fun showControls() {
+        bind.controlOverlay.visibility = View.VISIBLE
+        bind.volumeSlider.visibility = View.VISIBLE
+        bind.brightnessSlider.visibility = View.VISIBLE
+    }
+
+    private fun hideControls() {
+        bind.controlOverlay.visibility = View.GONE
+        bind.volumeSlider.visibility = View.GONE
+        bind.brightnessSlider.visibility = View.GONE
+    }
+
+    private fun toggleControls() {
+        if (bind.controlOverlay.visibility == View.VISIBLE) {
+            hideControls()
+        } else {
+            showControls()
+            resetUiTimer()
+        }
     }
 
     override fun onStart() { super.onStart(); vm.player.playWhenReady = true }
