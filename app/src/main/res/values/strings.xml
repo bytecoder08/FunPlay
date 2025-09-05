@@ -4,4 +4,13 @@
     <string name="tab_playlists">Playlists</string>
     <string name="tab_explorer">Explorer</string>
     <string name="player_more_options">Playback Options</string>
+
+    <string name="exo_prev">Previous</string>
+    <string name="exo_rewind">Rewind</string>
+    <string name="exo_play">Play</string>
+    <string name="exo_pause">Pause</string>
+    <string name="exo_ffwd">Forward</string>
+    <string name="exo_next">Next</string>
+    <string name="exo_fullscreen">Full Screen</string>
+
 </resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Default ExoPlayer controls -->
+    <include layout="@layout/exo_playback_control_view" />
+
+    <!-- Fullscreen button (top-right corner) -->
+    <ImageButton
+        android:id="@+id/btnFullscreen"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|top"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_fullscreen"
+        android:contentDescription="Fullscreen" />
+
+    <!-- Brightness slider (hidden by default) -->
+    <SeekBar
+        android:id="@+id/brightnessSlider"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="16dp"
+        android:visibility="gone" />
+
+</FrameLayout>

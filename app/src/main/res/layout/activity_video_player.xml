@@ -1,28 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <!-- ExoPlayer -->
     <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/playerView"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        app:use_controller="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:use_controller="false"
         app:resize_mode="fit"
-        app:show_buffering="when_playing"/>
+        app:show_buffering="when_playing" />
 
+    <!-- Overlay Controls -->
+    <LinearLayout
+        android:id="@+id/controlOverlay"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:padding="12dp">
+
+        <!-- Seekbar row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvCurrent"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tvTotal"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Playback buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageButton
+                android:id="@+id/btnPrev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_media_previous"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnRewind"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_media_rew"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnPlayPause"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@android:drawable/ic_media_play"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnForward"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_media_ff"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnNext"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_media_next"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnFullscreen"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_crop"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+
+            <ImageButton
+                android:id="@+id/btnOptions"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:background="@android:color/transparent"
+                app:tint="@android:color/white"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Vertical Sliders -->
     <LinearLayout
         android:orientation="vertical"
-        android:gravity="bottom"
-        android:padding="12dp"
-        android:layout_width="match_parent" android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|center_vertical"
+        android:gravity="center"
+        android:padding="8dp">
 
+        <!-- Volume slider -->
         <com.google.android.material.slider.Slider
             android:id="@+id/volumeSlider"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:valueFrom="0.0" android:valueTo="1.0" android:value="1.0"/>
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:rotation="270"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:value="1.0"
+            android:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOptions"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/player_more_options"/>
+        <!-- Brightness slider -->
+        <com.google.android.material.slider.Slider
+            android:id="@+id/brightnessSlider"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:rotation="270"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:value="0.5"
+            android:visibility="gone" />
     </LinearLayout>
+
+    <!-- Buffer spinner -->
+    <ProgressBar
+        android:id="@+id/bufferSpinner"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 </FrameLayout>
