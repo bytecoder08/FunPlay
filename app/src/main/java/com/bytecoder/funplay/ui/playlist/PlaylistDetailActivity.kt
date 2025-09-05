@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bytecoder.funplay.databinding.ActivityPlaylistDetailBinding
 import com.bytecoder.funplay.ui.player.PlaylistPlayerActivity
 import com.bytecoder.funplay.viewmodel.PlaylistDetailViewModel
-import com.bytecoder.funplay.viewmodel.PlaylistDetailViewModelFactory
 
 class PlaylistDetailActivity : AppCompatActivity() {
     companion object {
@@ -17,35 +16,27 @@ class PlaylistDetailActivity : AppCompatActivity() {
     }
 
     private lateinit var bind: ActivityPlaylistDetailBinding
-    private lateinit var adapter: PlaylistDetailAdapter
+    private val vm: PlaylistDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind = ActivityPlaylistDetailBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        val playlistId = intent.getLongExtra(EXTRA_PLAYLIST_ID, -1L)
+        val id = intent.getLongExtra(EXTRA_PLAYLIST_ID, -1L)
         title = intent.getStringExtra(EXTRA_PLAYLIST_NAME) ?: "Playlist"
+        vm.setPlaylistId(id)
 
-        // Initialize ViewModel with factory that passes playlistId
-        val vm: PlaylistDetailViewModel by viewModels {
-            PlaylistDetailViewModelFactory(application, playlistId)
-        }
-
-        adapter = PlaylistDetailAdapter()
+        val adapter = PlaylistDetailAdapter()
         bind.recycler.layoutManager = LinearLayoutManager(this)
         bind.recycler.adapter = adapter
 
-        // Play all button
         bind.btnPlayAll.setOnClickListener {
             startActivity(Intent(this, PlaylistPlayerActivity::class.java).apply {
-                putExtra(PlaylistPlayerActivity.EXTRA_PLAYLIST_ID, playlistId)
+                putExtra(PlaylistPlayerActivity.EXTRA_PLAYLIST_ID, id)
             })
         }
 
-        // Observe playlist items LiveData
-        vm.items.observe(this) { list ->
-            adapter.submitList(list)
-        }
+        vm.items.observe(this) { adapter.submitList(it) }
     }
 }

@@ -34,14 +34,10 @@ class VideoPlayerActivity : AppCompatActivity() {
         val player = vm.player
         bind.playerView.player = player
         bind.playerView.setControllerVisibilityListener(
-            object : StyledPlayerView.ControllerVisibilityListener {
-                override fun onVisibilityChanged(visibility: Int) {
-                    bind.volumeSlider.visibility = if (visibility == View.VISIBLE) View.VISIBLE else View.GONE
-                }
+            StyledPlayerView.ControllerVisibilityListener { vis ->
+                bind.volumeSlider.visibility = if (vis == View.VISIBLE) View.VISIBLE else View.GONE
             }
         )
-
-
 
         val uri = Uri.parse(intent.getStringExtra(EXTRA_VIDEO_URI))
         val title = intent.getStringExtra(EXTRA_VIDEO_TITLE) ?: "Video"
